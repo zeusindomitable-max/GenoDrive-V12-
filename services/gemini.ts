@@ -1,11 +1,17 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-// Always use the named parameter for apiKey and rely exclusively on process.env.API_KEY.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const getBioExplanation = async (step: string, details: string): Promise<string> => {
+  // Check if API key exists to prevent crashes in local environments
+  const apiKey = process.env.API_KEY;
+  
+  if (!apiKey || apiKey === "undefined" || apiKey === "") {
+    console.warn("Gemini API Key not found. AI Assistant is in offline mode.");
+    return "System running in localized cold-storage mode. (AI Assistant needs API Key to provide detailed analysis).";
+  }
+
   try {
+    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `
@@ -20,10 +26,10 @@ export const getBioExplanation = async (step: string, details: string): Promise<
         4. Be encouraging and "waaah" inducing.
       `,
     });
-    // Correctly accessing text property from GenerateContentResponse.
+    
     return response.text || "I'm analyzing the molecular structure, just a moment...";
   } catch (error) {
     console.error("Gemini Error:", error);
-    return "The bio-connection is currently unstable, but rest assured, your data is being handled with precision.";
+    return "The bio-connection is currently unstable, but rest assured, your data is being handled with precision locally.";
   }
 };
