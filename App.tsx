@@ -120,6 +120,14 @@ const App: React.FC = () => {
     setSystemMessage(SYSTEM_MESSAGES[WizardStep.RESURRECTION]);
   };
 
+  const handleStepChange = (newStep: WizardStep) => {
+    // Only allow navigating to steps that have data or is the start
+    if (newStep === WizardStep.LABORATORY || genoData) {
+      setStep(newStep);
+      setSystemMessage(SYSTEM_MESSAGES[newStep] || systemMessage);
+    }
+  };
+
   return (
     <div className="min-h-screen relative pb-20 overflow-x-hidden">
       <div className="dna-bg"></div>
@@ -127,7 +135,7 @@ const App: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 pt-8">
         <Header />
         
-        <Wizard currentStep={step} />
+        <Wizard currentStep={step} onStepClick={handleStepChange} />
 
         <main className="mt-8 transition-all duration-500 ease-in-out">
           {step === WizardStep.LABORATORY && (
